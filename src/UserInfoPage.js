@@ -15,7 +15,7 @@ const UserInfoPage = () => {
       <h4>Email: {formdata.email}</h4>
       <h4>Phone: {formdata.phone}</h4>
       <h4>Country: {formdata.country}</h4>
-      <h4>City: {formdata.city}</h4>
+      <h4>City: {formdata.state}</h4>
       <h4>Pan No.: {formdata.pan}</h4>
       <h4>Addhar No.: {formdata.aadhar}</h4>
     </div>

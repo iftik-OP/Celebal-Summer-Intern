@@ -11,10 +11,10 @@ function SignIn() {
     email: "",
     password: "",
     phone: "",
-    country: "",
-    city: "",
     pan: "",
     aadhar: "",
+    country: "",
+    state: "",
   });
   const initialErrors = {
     firstName: "",
@@ -23,8 +23,6 @@ function SignIn() {
     email: "",
     password: "",
     phone: "",
-    country: "",
-    city: "",
     pan: "",
     aadhar: "",
   };
@@ -89,11 +87,15 @@ function SignIn() {
   }, [formdata]);
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    setFormData({
+      ...formdata,
+      country: selectedCountry.name,
+    });
+    console.log(selectedCountry.name);
     if (validateForm()) {
       // Perform form submission logic here...
-      console.log(formdata);
 
+      console.log(selectedCountry.name);
       // Clear the form
       setFormData({
         firstName: "",
@@ -102,14 +104,47 @@ function SignIn() {
         email: "",
         password: "",
         phone: "",
-        country: "",
-        city: "",
         pan: "",
         aadhar: "",
       });
+
       navigate("/user", { state: { formdata } });
     }
   };
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState();
+
+  useEffect(() => {
+    fetch("https://xc-countries-api.fly.dev/api/countries/")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountries(data);
+        // set the first country as selected automatically
+        setSelectedCountry(data[0]);
+        setFormData({
+          ...formdata,
+          country: data[0].name,
+        });
+      });
+  }, []);
+
+  useEffect(() => {
+    // If there's no selected country, then prevent sending an API request and clear the states
+    if (!selectedCountry) {
+      setStates([]);
+      return;
+    }
+
+    fetch(
+      `https://xc-countries-api.fly.dev/api/countries/${selectedCountry.code}/states/`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setStates(data);
+        // set the first country as selected automatically
+      });
+  }, [selectedCountry]);
   return (
     <div className="App">
       <header className="App-header">
@@ -159,20 +194,52 @@ function SignIn() {
             onChange={handleChange}
           />
           {errors.phone && <p>{errors.phone}</p>}
-          <input
-            type="text"
-            name="country"
-            placeholder="Country"
-            value={formdata.country}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="city"
-            placeholder="City"
-            value={formdata.city}
-            onChange={handleChange}
-          />
+          <select
+            name="countries"
+            id="countries"
+            style={{
+              borderRadius: "5px",
+              fontSize: "1.3rem",
+            }}
+            onChange={(event) =>
+              setSelectedCountry(
+                countries.find(
+                  ({ id }) => id.toString() === event.target.value.toString(),
+                  console.log(selectedCountry.name)
+                )
+              )
+            }
+          >
+            {countries.map((country) => (
+              <option key={country.id} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          {!!states.length && (
+            <div>
+              <select
+                onChange={
+                  (event) =>
+                    setFormData({
+                      ...formdata,
+                      state: event.target.value,
+                    })
+                  // console.log(event.target.value)
+                }
+                name="states"
+                id="states"
+                style={{
+                  borderRadius: "5px",
+                  fontSize: "1.3rem",
+                }}
+              >
+                {states.map((state) => (
+                  <option key={state.id}>{state.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <input
             type="text"
             name="pan"
@@ -193,7 +260,7 @@ function SignIn() {
             className="submit"
             type="submit"
             value="Submit"
-            disabled={!isFormValid}
+            // disabled={!isFormValid}
           >
             Submit
           </button>
