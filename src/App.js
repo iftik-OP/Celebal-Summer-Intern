@@ -1,8 +1,9 @@
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
 
-function App() {
+function SignIn() {
   const [formdata, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,36 +40,30 @@ function App() {
   const validateForm = () => {
     let newErrors = { ...initialErrors };
 
-    // Validate email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(formdata.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Validate password length
     if (formdata.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters long";
     }
 
-    // Validate phone number length
     if (formdata.phone.length !== 10) {
       newErrors.phone = "Phone number must be exactly 10 digits long";
     }
 
-    // Validate PAN
     const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panPattern.test(formdata.pan)) {
       newErrors.pan = "Please enter a valid PAN";
     }
 
-    // Validate Aadhar number length
     if (formdata.aadhar.length !== 12) {
       newErrors.aadhar = "Aadhar number must be exactly 12 digits long";
     }
 
     setErrors(newErrors);
 
-    // If any error message is not empty, return false
     for (let field in newErrors) {
       if (newErrors[field]) {
         return false;
@@ -78,7 +73,6 @@ function App() {
     return true;
   };
   const filledForm = () => {
-    // If any field is empty, return false
     for (let field in formdata) {
       if (!formdata[field]) {
         return false;
@@ -87,6 +81,7 @@ function App() {
     return true;
   };
   const [isFormValid, setIsFormValid] = useState(false);
+  const navigate = useNavigate();
 
   // Call validateForm whenever formdata changes
   useEffect(() => {
@@ -112,6 +107,7 @@ function App() {
         pan: "",
         aadhar: "",
       });
+      navigate("/user", { state: { formdata } });
     }
   };
   return (
@@ -150,7 +146,7 @@ function App() {
           <input
             type="password"
             name="password"
-            placeholder="password"
+            placeholder="Password"
             value={formdata.password}
             onChange={handleChange}
           />
@@ -193,7 +189,12 @@ function App() {
             onChange={handleChange}
           />
           {errors.aadhar && <p>{errors.aadhar}</p>}
-          <button type="submit" value="Submit" disabled={!isFormValid}>
+          <button
+            className="submit"
+            type="submit"
+            value="Submit"
+            disabled={!isFormValid}
+          >
             Submit
           </button>
         </form>
@@ -202,4 +203,4 @@ function App() {
   );
 }
 
-export default App;
+export default SignIn;

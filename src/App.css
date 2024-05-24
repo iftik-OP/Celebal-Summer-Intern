@@ -25,3 +25,16 @@
 p{
   font-size: 10px;
 }
+
+input{
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.submit{
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 5px;
+}
